@@ -1,0 +1,90 @@
+#:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
+#:import FallOutTransition kivy.uix.screenmanager.FallOutTransition
+
+<Widget>:
+    font_name: "res/HackNerdFont"
+
+<InventoryScreen>:
+    on_pre_enter: self.load_items()
+    BoxLayout:
+        orientation: "vertical"
+        BoxLayout:
+            size_hint: 1, 0.05
+            Button:
+                size_hint: 0.05, 1
+                text: ""
+                on_press: root.manager.current = "home"
+            Label:
+                text: root.display_name
+            Button:
+                size_hint: 0.05, 1
+                text: ""
+                on_press: root.add_item_popup()
+        GridLayout:
+            id: item_access_list
+            cols: 1
+            padding: 20
+
+<DisplayableItem>:
+    text: self.name
+    text_size: self.size
+    size_hint_y: None
+    size: self.texture_size
+    padding: 20
+    halign: "left"
+
+<AddItemPopup>:
+    size_hint: None, None
+    size: 400, 400
+    BoxLayout:
+        orientation: "vertical"
+        BoxLayout:
+            id: input_fields
+        Button:
+            text: "add!"
+            on_press: root.add_to_inventory()
+
+<FieldEntry>:
+    Label:
+        text: root.field_name
+    TextInput:
+        id: str(root.field_name)
+
+<HomeScreen>:
+    on_enter: self.manager.transition = RiseInTransition()
+    on_leave: self.manager.transition = FallOutTransition()
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            size_hint: 1, 0.05
+            text: "Geclab"
+        GridLayout:
+            cols: 2
+            padding: 20
+            spacing: 10
+            Button:
+                text: "Equipamiento"
+                on_press: root.manager.current = "equipment"
+            Button:
+                text: "Drogas y Solventes"
+                on_press: root.manager.current = "drugs_and_solvents"
+            Button:
+                text: "Equipos de Seguridad e Higene"
+                on_press: root.manager.current = "safety_equipment"
+            Button:
+                text: "Materiales de Laboratorio"
+                on_press: root.manager.current = "lab_materials"
+
+<Geclab>:
+    transition: RiseInTransition()
+    HomeScreen:
+        name: "home"
+    EquipmentScreen:
+        name: "equipment"
+        display_name: "Equipamiento"
+    DrugsAndSolventsScreen:
+        name: "drugs_and_solvents"
+    SafetyEquipmentScreen:
+        name: "safety_equipment"
+    LabMaterialsScreen:
+        name: "lab_materials"
