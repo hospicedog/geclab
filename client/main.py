@@ -18,14 +18,14 @@ class InventoryScreen(Screen):
         raise NotImplemented
 
     @abstractmethod
-    def add_item(self):
+    def add_item(self, item):
         raise NotImplemented
 
     def load_items(self):
         item_access_list = self.ids.item_access_list
         item_access_list.clear_widgets()
         for item in self.get_items():
-            item_access_list.add_widget(item)
+            item_access_list.add_widget(DisplayableItem(name=item))
 
 class DisplayableItem(Button):
     name = StringProperty("") 
@@ -38,21 +38,25 @@ class DisplayableItem(Button):
 
 class FieldEntry(BoxLayout):
     field_name = StringProperty("")
-    def __init__(self, **kwargs):
+    def __init__(self, field_name, **kwargs):
         super(FieldEntry, self).__init__(**kwargs)
+        self.field_name = field_name
 
 class AddItemPopup(Popup):
     def __init__(self, inventory, **kwargs):
         super(AddItemPopup, self).__init__(**kwargs)
         self.inventory = inventory
-        for field_name in inventory.get_required_item_fields():
-            self.ids.input_fields.add_widget(FieldEntry(field_name=field_name))
+        self.entries = { field_name: FieldEntry(field_name) for field_name in inventory.get_required_item_fields() }
+        for entry in self.entries.values():
+            self.ids.input_fields.add_widget(entry)
 
     def add_to_inventory(self):
         for field_name in self.inventory.get_required_item_fields():
-            print(self.ids[field_name].text)
+            self.inventory.add_item(self.entries[field_name].ids.text_input.text)
+        self.inventory.load_items()
 
 class EquipmentScreen(InventoryScreen):
+    items = []
     class Item():
         def __init__(self, name):
             self.name = name
@@ -63,8 +67,11 @@ class EquipmentScreen(InventoryScreen):
     def add_item_popup(self):
         AddItemPopup(self).open()
 
+    def add_item(self, item):
+        self.items.append(item)
+
     def get_items(self):
-        return []
+        return self.items
 
 class DrugsAndSolventsScreen(InventoryScreen):
     display_name = "Drogas y Solventes"
