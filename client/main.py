@@ -10,13 +10,42 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 class HomeScreen(Screen):
     pass
 
+class Item:
+    name = ""
+
+    def get_name(self):
+        return self.name
+
+    @classmethod
+    @abstractmethod
+    def required_fields(cls):
+        raise NotImplemented
+
+    @classmethod
+    @abstractmethod
+    def from_input_entries(cls, entries):
+        raise NotImplemented
+
+class EquipmentItem(Item):
+    def __init__(self, name, serial):
+        self.name = name
+        self.serial = serial
+
+    @classmethod
+    def required_fields(cls):
+        return [ "name", "serial" ]
+
+    @classmethod
+    def from_input_entries(cls, entries):
+        return cls(entries["name"], entries["serial"])
+
 class InventoryView(Screen):
     items = []
     display_name = StringProperty("")
 
+    @abstractmethod
     def add_item(self, item):
-        self.items.append(item)
-        self.load_items()
+        raise NotImplemented
 
     def create_new_item(self):
         AddItemView(self).open()
@@ -29,7 +58,7 @@ class InventoryView(Screen):
         item_access_list = self.ids.item_access_list
         item_access_list.clear_widgets()
         for item in self.items:
-            item_access_list.add_widget(ItemView(name=item["name"]))
+            item_access_list.add_widget(ItemView(name=item.get_name()))
 
 class ItemView(Button):
     name = StringProperty("") 
@@ -52,7 +81,11 @@ class AddItemView(Popup):
 
 class EquipmentScreen(InventoryView):
     def get_required_item_fields(self):
-        return [ "name" ]
+        return EquipmentItem.required_fields()
+
+    def add_item(self, item):
+        self.items.append(EquipmentItem.from_input_entries(item))
+        self.load_items()
 
 class DrugsAndSolventsScreen(InventoryView):
     pass
