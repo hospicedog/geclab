@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+from pydantic import BaseModel
 from kivy.app import App
 from kivy.app import StringProperty, ObjectProperty
 from kivy.uix.button import Button
@@ -11,34 +12,14 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 class HomeScreen(Screen):
     pass
 
-class Item:
-    name = ""
+class Item(BaseModel):
+    name: str
 
     def get_name(self):
         return self.name
 
-    @classmethod
-    @abstractmethod
-    def required_fields(cls):
-        raise NotImplemented
-
-    @classmethod
-    @abstractmethod
-    def from_input_entries(cls, entries):
-        raise NotImplemented
-
 class EquipmentItem(Item):
-    def __init__(self, name, serial):
-        self.name = name
-        self.serial = serial
-
-    @classmethod
-    def required_fields(cls):
-        return [ "name", "serial" ]
-
-    @classmethod
-    def from_input_entries(cls, entries):
-        return cls(entries["name"], entries["serial"])
+    serial: str
 
 class InventoryView(Screen):
     items = []
@@ -64,8 +45,8 @@ class InventoryView(Screen):
 class ItemView(Screen):
     def __init__(self, item, **kwargs):
         super(ItemView, self).__init__(name=item.get_name(), **kwargs)
-        for field_name in item.required_fields():
-            self.ids.item_data.add_widget(FieldView(text=field_name))
+        for k, v in item.model_dump().items():
+            self.ids.item_data.add_widget(FieldView(text=f"{k}: {v}"))
 
 class FieldView(Label):
     pass
@@ -92,10 +73,10 @@ class AddItemView(Popup):
 
 class EquipmentScreen(InventoryView):
     def get_required_item_fields(self):
-        return EquipmentItem.required_fields()
+        return EquipmentItem.model_fields.keys()
 
     def add_item(self, item):
-        equipment_item = EquipmentItem.from_input_entries(item)
+        equipment_item = EquipmentItem.model_validate(item)
         self.items.append(equipment_item)
         self.load_items()
         self.manager.add_widget(ItemView(equipment_item))
