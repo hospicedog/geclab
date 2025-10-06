@@ -15,9 +15,6 @@ class HomeScreen(Screen):
 class Item(BaseModel):
     name: str
 
-    def get_name(self):
-        return self.name
-
 class EquipmentItem(Item):
     serial: str
 
@@ -40,11 +37,11 @@ class InventoryView(Screen):
         item_access_list = self.ids.item_access_list
         item_access_list.clear_widgets()
         for item in self.items:
-            item_access_list.add_widget(ItemEntryView(name=item.get_name(), inventory=self))
+            item_access_list.add_widget(ItemEntryView(name=item.name, inventory=self))
 
 class ItemView(Screen):
     def __init__(self, item, **kwargs):
-        super(ItemView, self).__init__(name=item.get_name(), **kwargs)
+        super(ItemView, self).__init__(name=item.name, **kwargs)
         for k, v in item.model_dump().items():
             self.ids.item_data.add_widget(FieldView(text=f"{k}: {v}"))
 
