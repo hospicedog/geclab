@@ -26,12 +26,18 @@
             padding: 20
 
 <ItemView>:
+    BoxLayout:
+        id: item_data
+        orientation: "vertical"
+
+<ItemEntryView>:
     text: self.name
     text_size: self.size
     size_hint_y: None
     size: self.texture_size
     padding: 20
     halign: "left"
+    on_press: self.inventory.manager.current = self.name
 
 <AddItemView>:
     size_hint: None, None

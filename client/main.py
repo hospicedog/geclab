@@ -1,8 +1,9 @@
 from abc import abstractmethod
 
 from kivy.app import App
-from kivy.app import StringProperty
+from kivy.app import StringProperty, ObjectProperty
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -58,10 +59,20 @@ class InventoryView(Screen):
         item_access_list = self.ids.item_access_list
         item_access_list.clear_widgets()
         for item in self.items:
-            item_access_list.add_widget(ItemView(name=item.get_name()))
+            item_access_list.add_widget(ItemEntryView(name=item.get_name(), inventory=self))
 
-class ItemView(Button):
+class ItemView(Screen):
+    def __init__(self, item, **kwargs):
+        super(ItemView, self).__init__(name=item.get_name(), **kwargs)
+        for field_name in item.required_fields():
+            self.ids.item_data.add_widget(FieldView(text=field_name))
+
+class FieldView(Label):
+    pass
+
+class ItemEntryView(Button):
     name = StringProperty("") 
+    inventory = ObjectProperty()
 
 class FieldInputView(BoxLayout):
     field_name = StringProperty("")
@@ -84,8 +95,10 @@ class EquipmentScreen(InventoryView):
         return EquipmentItem.required_fields()
 
     def add_item(self, item):
-        self.items.append(EquipmentItem.from_input_entries(item))
+        equipment_item = EquipmentItem.from_input_entries(item)
+        self.items.append(equipment_item)
         self.load_items()
+        self.manager.add_widget(ItemView(equipment_item))
 
 class DrugsAndSolventsScreen(InventoryView):
     pass
