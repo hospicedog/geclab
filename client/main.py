@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from datetime import date
 
 from pydantic import BaseModel
 from kivy.app import App
@@ -9,6 +10,13 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
+
+TRANSLATIONS = {
+    "name": "Nombre",
+    "serial": "Código serial",
+    "first_operational_date": "Primer uso",
+}
+
 class HomeScreen(Screen):
     pass
 
@@ -16,7 +24,8 @@ class Item(BaseModel):
     name: str
 
 class EquipmentItem(Item):
-    serial: str
+    serial: int
+    first_operational_date: date
 
 class InventoryView(Screen):
     items = []
@@ -48,7 +57,7 @@ class ItemView(Screen):
     def __init__(self, item, **kwargs):
         super(ItemView, self).__init__(name=item.name, **kwargs)
         for k, v in item.model_dump().items():
-            self.ids.item_data.add_widget(FieldView(text=f"{k}: {v}"))
+            self.ids.item_data.add_widget(FieldView(text=f"{TRANSLATIONS[k]}: {v}"))
 
 class FieldView(Label):
     pass
@@ -59,6 +68,10 @@ class ItemEntryView(Button):
 
 class FieldInputView(BoxLayout):
     field_name = StringProperty("")
+
+    def __init__(self, **kwargs):
+        super(FieldInputView, self).__init__(**kwargs)
+        self.field_name = TRANSLATIONS[self.field_name]
 
 class AddItemView(Popup):
     def __init__(self, inventory, **kwargs):
@@ -74,7 +87,7 @@ class AddItemView(Popup):
         self.dismiss()
 
 class EquipmentScreen(InventoryView):
-    def get_item_type(self):
+    def get_item_model(self):
         return EquipmentItem
 
 class DrugsAndSolventsScreen(InventoryView):
