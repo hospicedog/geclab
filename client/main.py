@@ -23,15 +23,20 @@ class InventoryView(Screen):
     display_name = StringProperty("")
 
     @abstractmethod
+    def get_item_model(self):
+        return Item
+
     def add_item(self, item):
-        raise NotImplemented
+        equipment_item = self.get_item_model().model_validate(item)
+        self.items.append(equipment_item)
+        self.load_items()
+        self.manager.add_widget(ItemView(equipment_item))
 
     def create_new_item(self):
         AddItemView(self).open()
 
-    @abstractmethod
     def get_required_item_fields(self):
-        raise NotImplemented
+        return self.get_item_model().model_fields.keys()
 
     def load_items(self):
         item_access_list = self.ids.item_access_list
@@ -69,14 +74,8 @@ class AddItemView(Popup):
         self.dismiss()
 
 class EquipmentScreen(InventoryView):
-    def get_required_item_fields(self):
-        return EquipmentItem.model_fields.keys()
-
-    def add_item(self, item):
-        equipment_item = EquipmentItem.model_validate(item)
-        self.items.append(equipment_item)
-        self.load_items()
-        self.manager.add_widget(ItemView(equipment_item))
+    def get_item_type(self):
+        return EquipmentItem
 
 class DrugsAndSolventsScreen(InventoryView):
     pass
