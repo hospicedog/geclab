@@ -56,6 +56,9 @@
         text: root.field_name
     TextInput:
         id: text_input
+        write_tab: False
+        multiline: False
+        on_text_validate: root.add_to_inventory()
 
 <HomeScreen>:
     on_enter: self.manager.transition = RiseInTransition()

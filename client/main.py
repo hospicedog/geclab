@@ -68,16 +68,20 @@ class ItemEntryView(Button):
 
 class FieldInputView(BoxLayout):
     field_name = StringProperty("")
+    popup = ObjectProperty()
 
     def __init__(self, **kwargs):
         super(FieldInputView, self).__init__(**kwargs)
         self.field_name = TRANSLATIONS[self.field_name]
 
+    def add_to_inventory(self):
+        self.popup.add_to_inventory()
+
 class AddItemView(Popup):
     def __init__(self, inventory, **kwargs):
         super(AddItemView, self).__init__(**kwargs)
         self.inventory = inventory
-        self.entries = { field_name: FieldInputView(field_name=field_name) for field_name in inventory.get_required_item_fields() }
+        self.entries = { field_name: FieldInputView(field_name=field_name, popup=self) for field_name in inventory.get_required_item_fields() }
         for entry in self.entries.values():
             self.ids.input_fields.add_widget(entry)
 
