@@ -1,5 +1,6 @@
 #:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
 #:import FallOutTransition kivy.uix.screenmanager.FallOutTransition
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
 
 <Widget>:
     font_name: "res/HackNerdFont"
@@ -13,7 +14,9 @@
             Button:
                 size_hint: 0.05, 1
                 text: ""
-                on_press: root.manager.current = "home"
+                on_press: 
+                    root.manager.transition = FallOutTransition()
+                    root.manager.current = "home"
             Label:
                 text: root.display_name
             Button:
@@ -29,6 +32,12 @@
     BoxLayout:
         id: item_data
         orientation: "vertical"
+        Button:
+            size_hint: 0.05, 1
+            text: ""
+            on_press: 
+                root.manager.transition.direction = "right"
+                root.manager.current = root.previous_screen.name
 
 <ItemEntryView>:
     text: self.name
@@ -37,7 +46,10 @@
     size: self.texture_size
     padding: 20
     halign: "left"
-    on_press: self.inventory.manager.current = self.name
+    on_press: 
+        self.inventory.manager.transition = SlideTransition()
+        self.inventory.manager.transition.direction = "left"
+        self.inventory.manager.current = self.name
 
 <AddItemView>:
     size_hint: None, None
@@ -62,7 +74,6 @@
 
 <HomeScreen>:
     on_enter: self.manager.transition = RiseInTransition()
-    on_leave: self.manager.transition = FallOutTransition()
     BoxLayout:
         orientation: "vertical"
         Label:

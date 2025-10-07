@@ -36,10 +36,13 @@ class InventoryView(Screen):
         return Item
 
     def add_item(self, item):
-        equipment_item = self.get_item_model().model_validate(item)
-        self.items.append(equipment_item)
+        item = self.get_item_model().model_validate(item)
+        self.items.append(item)
         self.load_items()
-        self.manager.add_widget(ItemView(equipment_item))
+        item_view = ItemView(item)
+        item_view.set_previous_screen(self)
+        self.manager.add_widget(item_view)
+
 
     def create_new_item(self):
         AddItemView(self).open()
@@ -58,6 +61,9 @@ class ItemView(Screen):
         super(ItemView, self).__init__(name=item.name, **kwargs)
         for k, v in item.model_dump().items():
             self.ids.item_data.add_widget(FieldView(text=f"{TRANSLATIONS[k]}: {v}"))
+
+    def set_previous_screen(self, previous_screen):
+        self.previous_screen = previous_screen
 
 class FieldView(Label):
     pass
