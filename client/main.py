@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, Field
 from kivy.app import App
 from kivy.app import StringProperty, ObjectProperty
 from kivy.uix.button import Button
@@ -21,7 +21,7 @@ class HomeScreen(Screen):
     pass
 
 class Item(BaseModel):
-    name: str
+    name: str = Field(min_length=1)
 
 class EquipmentItem(Item):
     serial: int
@@ -93,8 +93,13 @@ class AddItemView(Popup):
 
     def add_to_inventory(self):
         item = { field_name: self.entries[field_name].ids.text_input.text for field_name in self.entries.keys() }
-        self.inventory.add_item(item)
-        self.dismiss()
+        try:
+            self.inventory.add_item(item)
+            self.dismiss()
+        except ValidationError as e:
+            for bad_field in e.errors():
+                print(bad_field["loc"][0])
+
 
 class EquipmentScreen(InventoryView):
     def get_item_model(self):
