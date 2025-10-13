@@ -28,8 +28,11 @@ class EquipmentItem(Item):
     first_operational_date: date
 
 class InventoryView(Screen):
-    items = []
     display_name = StringProperty("")
+
+    def __init__(self, **kwargs):
+        self.items = []
+        super().__init__(**kwargs)
 
     @abstractmethod
     def get_item_model(self):
@@ -42,7 +45,6 @@ class InventoryView(Screen):
         item_view = ItemView(item)
         item_view.set_previous_screen(self)
         self.manager.add_widget(item_view)
-
 
     def create_new_item(self):
         AddItemView(self).open()
