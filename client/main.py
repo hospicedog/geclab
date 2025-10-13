@@ -60,7 +60,7 @@ class InventoryView(Screen):
 
 class ItemView(Screen):
     def __init__(self, item, **kwargs):
-        super(ItemView, self).__init__(name=item.name, **kwargs)
+        super().__init__(name=item.name, **kwargs)
         for k, v in item.model_dump().items():
             self.ids.item_data.add_widget(FieldView(text=f"{TRANSLATIONS[k]}: {v}"))
 
@@ -79,7 +79,7 @@ class FieldInputView(BoxLayout):
     popup = ObjectProperty()
 
     def __init__(self, **kwargs):
-        super(FieldInputView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.field_name = TRANSLATIONS[self.field_name]
 
     def add_to_inventory(self):
@@ -87,7 +87,7 @@ class FieldInputView(BoxLayout):
 
 class AddItemView(Popup):
     def __init__(self, inventory, **kwargs):
-        super(AddItemView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.inventory = inventory
         self.entries = { field_name: FieldInputView(field_name=field_name, popup=self) for field_name in inventory.get_required_item_fields() }
         for entry in self.entries.values():
