@@ -90,6 +90,12 @@ class FieldInputView(BoxLayout):
         super().__init__(**kwargs)
         self.field_name = NAME_VIEW[self.field_name]
 
+    def highlight_field(self):
+        self.ids.field_input_name.color = (1, 0.1, 0, 1)
+
+    def reset_highlight(self):
+        self.ids.field_input_name.color = (1, 1, 1, 1)
+
     def add_to_inventory(self):
         self.popup.add_to_inventory()
 
@@ -103,12 +109,14 @@ class AddItemView(Popup):
 
     def add_to_inventory(self):
         item = { field_name: self.entries[field_name].ids.text_input.text for field_name in self.entries.keys() }
+        for field_name in self.entries.keys():
+            self.entries[field_name].reset_highlight()
         try:
             self.inventory.add_item(item)
             self.dismiss()
         except ValidationError as e:
             for bad_field in e.errors():
-                print(bad_field["loc"][0])
+                self.entries[bad_field["loc"][0]].highlight_field()
 
 
 class EquipmentScreen(InventoryView):
