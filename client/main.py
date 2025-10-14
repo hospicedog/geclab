@@ -11,14 +11,21 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 
-TRANSLATIONS = {
+NAME_VIEW = {
     "name": "Nombre",
     "serial": "Código serial",
     "first_operational_date": "Primer uso",
+    "equipment": "Equipamiento",
+    "drugs_and_solvents": "Drogas y Solventes",
+    "safety_equipment": "Equipos de Seguridad e Higene",
+    "lab_materials": "Materiales de Laboratorio"
 }
 
 class HomeScreen(Screen):
-    pass
+    name = StringProperty("home")
+
+    def screen_display_name(self, name):
+        return NAME_VIEW[name]
 
 class Item(BaseModel):
     name: str = Field(min_length=1)
@@ -31,8 +38,9 @@ class InventoryView(Screen):
     display_name = StringProperty("")
 
     def __init__(self, **kwargs):
-        self.items = []
         super().__init__(**kwargs)
+        self.items = []
+        self.display_name = NAME_VIEW[self.name]
 
     @abstractmethod
     def get_item_model(self):
@@ -62,7 +70,7 @@ class ItemView(Screen):
     def __init__(self, item, **kwargs):
         super().__init__(name=item.name, **kwargs)
         for k, v in item.model_dump().items():
-            self.ids.item_data.add_widget(FieldView(text=f"{TRANSLATIONS[k]}: {v}"))
+            self.ids.item_data.add_widget(FieldView(text=f"{NAME_VIEW[k]}: {v}"))
 
     def set_previous_screen(self, previous_screen):
         self.previous_screen = previous_screen
@@ -80,7 +88,7 @@ class FieldInputView(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.field_name = TRANSLATIONS[self.field_name]
+        self.field_name = NAME_VIEW[self.field_name]
 
     def add_to_inventory(self):
         self.popup.add_to_inventory()
@@ -104,17 +112,19 @@ class AddItemView(Popup):
 
 
 class EquipmentScreen(InventoryView):
+    name = StringProperty("equipment")
+
     def get_item_model(self):
         return EquipmentItem
 
 class DrugsAndSolventsScreen(InventoryView):
-    pass
+    name = StringProperty("drugs_and_solvents")
 
 class SafetyEquipmentScreen(InventoryView):
-    pass
+    name = StringProperty("safety_equipment")
 
 class LabMaterialsScreen(InventoryView):
-    pass
+    name = StringProperty("lab_materials")
 
 class Geclab(ScreenManager):
     pass

@@ -84,29 +84,22 @@
             padding: 20
             spacing: 10
             Button:
-                text: "Equipamiento"
+                text: root.screen_display_name("equipment")
                 on_press: root.manager.current = "equipment"
             Button:
-                text: "Drogas y Solventes"
+                text: root.screen_display_name("drugs_and_solvents")
                 on_press: root.manager.current = "drugs_and_solvents"
             Button:
-                text: "Equipos de Seguridad e Higene"
+                text: root.screen_display_name("safety_equipment")
                 on_press: root.manager.current = "safety_equipment"
             Button:
-                text: "Materiales de Laboratorio"
+                text: root.screen_display_name("lab_materials")
                 on_press: root.manager.current = "lab_materials"
 
 <Geclab>:
     transition: RiseInTransition()
-    HomeScreen:
-        name: "home"
-    EquipmentScreen:
-        name: "equipment"
-        display_name: "Equipamiento"
-    DrugsAndSolventsScreen:
-        name: "drugs_and_solvents"
-        display_name: "Drogas y solventes"
-    SafetyEquipmentScreen:
-        name: "safety_equipment"
-    LabMaterialsScreen:
-        name: "lab_materials"
+    HomeScreen
+    EquipmentScreen
+    DrugsAndSolventsScreen
+    SafetyEquipmentScreen
+    LabMaterialsScreen
