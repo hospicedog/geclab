@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, Column, String
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from fastapi import FastAPI, Depends
-from pydantic import BaseModel
+
+from common.items import Item
 
 app = FastAPI()
 DB_URL = "sqlite:///./inventory.db"
@@ -9,11 +10,7 @@ engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-class ItemBase(BaseModel):
-    code: str
-    name: str
-
-class Item(Base):
+class ItemEntry(Base):
     __tablename__ = "machine"
     code = Column(String, primary_key=True, index=True)
     name = Column(String)
@@ -29,11 +26,11 @@ def get_db():
 
 @app.get("/")
 async def return_items(db: Session = Depends(get_db)):
-    return db.query(Item).all()
+    return db.query(ItemEntry).all()
 
 @app.post("/newEntry")
-async def new_entry(entry: ItemBase, db: Session = Depends(get_db)):
-    db_item = Item(**entry.model_dump())
+async def new_entry(entry: Item, db: Session = Depends(get_db)):
+    db_item = ItemEntry(**entry.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

@@ -1,7 +1,6 @@
 from abc import abstractmethod
-from datetime import date
 
-from pydantic import BaseModel, ValidationError, Field
+from pydantic import ValidationError
 from kivy.app import App
 from kivy.app import StringProperty, ObjectProperty
 from kivy.uix.button import Button
@@ -10,6 +9,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
+from common.items import Item, EquipmentItem
 
 NAME_VIEW = {
     "name": "Nombre",
@@ -26,13 +26,6 @@ class HomeScreen(Screen):
 
     def screen_display_name(self, name):
         return NAME_VIEW[name]
-
-class Item(BaseModel):
-    name: str = Field(min_length=1)
-
-class EquipmentItem(Item):
-    serial: int
-    first_operational_date: date
 
 class InventoryView(Screen):
     display_name = StringProperty("")
